@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "digital-chromatography"
+version = "0.1.0"
+description = "Conditional diffusion for separation of mixed analytical spectra"
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+authors = [
+  {name = "Andrew B. Schofield"},
+  {name = "Andrew V. Marquardt"},
+  {name = "Brett M. Savoie", email = "bsavoie2@nd.edu"},
+]
+
+[tool.setuptools.packages.find]
+include = ["diffdmx*"]

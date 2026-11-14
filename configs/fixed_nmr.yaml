@@ -1,0 +1,90 @@
+# Edit these paths before running.
+work_dir: outputs/fixed_nmr
+model_save_prefix: fixed_nmr
+seed: 17
+device: cuda
+
+dataset:
+  data_csv: /absolute/path/to/all_nmr_spectra.csv
+  train_smiles: /absolute/path/to/all_nmr_train.txt
+  val_smiles: /absolute/path/to/all_nmr_val.txt
+  test_smiles: /absolute/path/to/all_nmr_test.txt
+  validation_series: val
+  spec_len: 993
+  epoch_size:
+    train: 100000
+    val: 5000
+    inference: 500
+
+evaluation:
+  checkpoint_path: /absolute/path/to/fixed_nmr_checkpoint.pt
+  output_dir: outputs/fixed_nmr/evaluation
+  split: test
+  steps: [100]
+  nmr: true
+
+model:
+  class_path: diffdmx.model.DiffusionSeparator
+  init_args:
+    skip_nan_loss: true
+    augmentation:
+      _target_: diffdmx.transforms.Compose
+      transform_list: []
+    latent_interface:
+      _target_: diffdmx.latents.IdentityLatentInterface
+    conditioner:
+      _target_: diffdmx.conditioners.autoencoder.ConditionerAutoencoder
+      in_channels: 1
+      channels: [56, 112, 224, 448, 896]
+      factors: ${model.init_args.diffusion.factors}
+      context_channels: ${model.init_args.diffusion.context_channels}
+      attentions: ${model.init_args.diffusion.attentions}
+      attention_heads: 8
+      attention_features: 64
+      num_groups: 8
+      kernel_size: 3
+    diffusion:
+      _target_: diffdmx.audio_diffusion_pytorch.DiffusionModel
+      net_t:
+        _target_: diffdmx.utils.get_hook
+        import_path: diffdmx.audio_diffusion_pytorch.UNetV0
+      sample_rate: 44100
+      dim: 1
+      in_channels: 1
+      out_channels: 1
+      channels: [56, 112, 224, 448, 896]
+      context_channels: [0, 0, 1, 1, 1]
+      factors: [1, 2, 2, 2, 2]
+      items: [1, 1, 1, 1, 1]
+      attentions: [0, 0, 1, 1, 1]
+      attention_heads: 8
+      attention_features: 64
+      inject_system: concatenation
+      diffusion_t:
+        _target_: diffdmx.utils.get_hook
+        import_path: diffdmx.diffusion.VDiffusionL
+      sampler_t:
+        _target_: diffdmx.utils.get_hook
+        import_path: diffdmx.diffusion.VSamplerL
+    optimizer:
+      _target_: torch.optim.AdamW
+      lr: 3.2e-5
+      weight_decay: 0.0
+
+train:
+  resume_from_latest: false
+  epochs: 500
+  save_every: 5
+  inference_num_steps: 10
+  lr_schedule:
+    warmup_epochs: 10
+    hold_epochs: 40
+    warmup_start_lr: 0.0
+    min_lr: 1.0e-10
+  force_float32: true
+  disable_model_autocast: true
+  skip_full_load_pass: true
+  stop_on_nonfinite: true
+
+batch_size: 128
+num_workers: 4

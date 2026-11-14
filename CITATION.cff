@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated manuscript and archived software release."
+title: "Digital Chromatography: Computational Separation of Mixed Spectra through Conditional Diffusion"
+type: software
+version: 0.1.0
+authors:
+  - family-names: Schofield
+    given-names: Andrew B.
+  - family-names: Marquardt
+    given-names: Andrew V.
+  - family-names: Savoie
+    given-names: Brett M.
+    email: bsavoie2@nd.edu
+abstract: >-
+  Conditional diffusion workflows for separating pure-component infrared and
+  proton NMR spectra from additive mixtures.
+keywords:
+  - source separation
+  - diffusion model
+  - infrared spectroscopy
+  - nuclear magnetic resonance
+  - spectral unmixing
